@@ -6,7 +6,7 @@ import QuotesAPI from "@/Components/QuotesAPI.vue";
 </script>
 
 <template>
-    <Head title="Dashboard"/>
+    <Head title="Dashboard"></Head>
 
     <AuthenticatedLayout>
         <template #header>
