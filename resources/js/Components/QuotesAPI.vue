@@ -26,7 +26,6 @@ export default {
                 .then((data) => {
                     const randomIndex = Math.floor(Math.random() * data.length);
                     this.quote = data[randomIndex];
-                    console.log(this.quote);
                 })
                 .catch((error) => {
                     console.error("Error fetching quote:", error);
