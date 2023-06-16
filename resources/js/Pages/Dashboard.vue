@@ -1,10 +1,3 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import {Head} from '@inertiajs/vue3';
-import GreetingMessage from '@/Components/GreetingMessage.vue';
-import QuotesAPI from "@/Components/QuotesAPI.vue";
-</script>
-
 <template>
     <Head title="Dashboard"></Head>
 
@@ -15,7 +8,7 @@ import QuotesAPI from "@/Components/QuotesAPI.vue";
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-2 lg:px-4">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg text-center">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-lg text-center">
                     <div class="pt-6 text-2xl text-gray-900 dark:text-gray-100">
                         <GreetingMessage/>
                         {{ $page.props.auth.user.name }}.
@@ -28,50 +21,82 @@ import QuotesAPI from "@/Components/QuotesAPI.vue";
             </div>
         </div>
 
-        <div class="grid grid-cols-4 gap-2">
-            <div>
-                <div class="max-w-7xl mx-auto sm:px-2 lg:px-4">
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 w-100 flex flex-1 flex-col gap-2 text-gray-900 dark:text-gray-100 text-base">
-                            <p class="uppercase">Active Builds</p>
-                            <span class="text-xl">10</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <div class="max-w-7xl mx-auto sm:px-2 lg:px-4">
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 w-100 flex flex-1 flex-col gap-2 text-gray-900 dark:text-gray-100 text-base">
-                            <p class="uppercase">Completed Builds</p>
-                            <span class="text-xl">5</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row-span-3 col-span-2">
-                <div class="max-w-7xl mx-auto sm:px-2 lg:px-4">
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 text-gray-900 dark:text-gray-100 text-base flex flex-1 gap-2 flex-col">
-                            <p class="uppercase">Notifications</p>
-                            <ul>
-                                <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sem.</li>
-                                <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sem.</li>
-                                <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sem.</li>
-                                <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sem.</li>
-                                <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sem.</li>
-                                <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sem.</li>
-                                <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sem.</li>
-                                <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sem.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <DashboardGrid/>
     </AuthenticatedLayout>
 </template>
 
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import {Head} from '@inertiajs/vue3';
+import GreetingMessage from '@/Components/GreetingMessage.vue';
+import QuotesAPI from "@/Components/QuotesAPI.vue";
+import DashboardGrid from "@/Components/DashboardGrid.vue";
+</script>
 
+<style scoped>
+ul {
+    list-style-type: circle;
+    padding-left: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.vue-grid-layout {
+    background: #eee;
+}
+
+.vue-grid-item:not(.vue-grid-placeholder) {
+    background: #ccc;
+    border: 1px solid black;
+}
+
+.vue-grid-item .resizing {
+    opacity: 0.9;
+}
+
+.vue-grid-item .static {
+    background: #cce;
+}
+
+.vue-grid-item .text {
+    font-size: 24px;
+    text-align: center;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    height: 100%;
+    width: 100%;
+}
+
+.vue-grid-item .no-drag {
+    height: 100%;
+    width: 100%;
+}
+
+.vue-grid-item .minMax {
+    font-size: 12px;
+}
+
+.vue-grid-item .add {
+    cursor: pointer;
+}
+
+.vue-draggable-handle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 0;
+    left: 0;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' fill='#999999'/></svg>") no-repeat;
+    background-position: bottom right;
+    padding: 0 8px 8px 0;
+    background-repeat: no-repeat;
+    background-origin: content-box;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+</style>

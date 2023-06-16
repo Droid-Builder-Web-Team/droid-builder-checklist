@@ -8,7 +8,6 @@
 
     <script src="https://kit.fontawesome.com/dd6bff54df.js" crossorigin="anonymous"></script>
 
-
     <!-- Scripts -->
     @routes
     @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
