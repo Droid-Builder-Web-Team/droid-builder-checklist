@@ -21,7 +21,11 @@
             </div>
         </div>
 
-        <DashboardGrid/>
+        <div class="max-w-7xl mx-auto sm:px-2 lg:px-4">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-lg text-center">
+                <DashboardGrid/>
+            </div>
+        </div>
     </AuthenticatedLayout>
 </template>
 
