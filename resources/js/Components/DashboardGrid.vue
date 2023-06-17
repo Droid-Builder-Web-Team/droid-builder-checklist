@@ -42,7 +42,6 @@ export default {
             this.items = mapGridItems(parsedGrid, this.items);
             this.items.forEach((item) => {
                 const element = document.querySelector(`[data-gs-x="${item.x}"][data-gs-y="${item.y}"]`);
-                console.log(element);
                 if (element) {
                     item.w = element.clientWidth;
                     item.h = element.clientHeight;
@@ -72,7 +71,6 @@ export default {
                 }
             });
 
-
             const serializedGrid = JSON.stringify(this.items);
             Cookies.set('gridArrangement', serializedGrid);
         }
@@ -86,6 +84,7 @@ export default {
 
             // Update the changed items with their new values
             changedItems.forEach((changedItem) => {
+                console.log(changedItem);
                 const {x, y, title, content} = changedItem;
                 const existingItem = updatedItems.find((item) => item.x === x && item.y === y);
                 if (existingItem) {
@@ -168,7 +167,9 @@ export default {
             handler(newItems) {
                 // Serialize and save only the updated items to the cookie
                 const serializedGrid = JSON.stringify(mapGridItems(newItems));
-                console.log(serializedGrid);
+                setTimeout(function () {
+                    console.log(serializedGrid)
+                }, 2000);
                 Cookies.set('gridArrangement', serializedGrid);
             }
         }
