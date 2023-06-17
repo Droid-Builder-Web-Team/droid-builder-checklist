@@ -7,6 +7,7 @@
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
     <script src="https://kit.fontawesome.com/dd6bff54df.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Scripts -->
     @routes

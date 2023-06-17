@@ -9,24 +9,79 @@ import 'gridstack/dist/gridstack.min.css';
 import 'gridstack/dist/gridstack-extra.min.css';
 import 'gridstack/dist/gridstack-all.js';
 import {GridStack} from 'gridstack';
+import Cookies from 'js-cookie';
 
 export default {
     mounted() {
         let items = [
-            {title: 'Title 1', content: 'Content 1'},
-            {title: 'Title 2', content: 'Content 2'},
-            {title: 'Title 3', content: 'Content 3'},
+            {title: 'Active Builds', content: 'You are currently working on: R2-D2, R5-D4, BB8', x: 0, y: 0},
+            {title: 'Completed Builds', content: 'You have completed 10 Droids!', x: 1, y: 0},
+            {title: 'Notifications', content: 'No new notifications', x: 2, y: 0},
         ];
+
         let grid = GridStack.init({column: 3});
+
+        // Load the user's preset grid arrangement if it exists
+        const savedGrid = Cookies.get('gridArrangement');
+        const parsedGrid = savedGrid ? JSON.parse(savedGrid) : null;
+
+        if (parsedGrid) {
+            items = mapGridItems(parsedGrid, items);
+        }
+
+        // Add missing blocks to the items array
+        if (parsedGrid) {
+            const existingCoordinates = items.map((item) => `${item.x}-${item.y}`);
+            parsedGrid.forEach((block) => {
+                const coordinates = `${block.x}-${block.y}`;
+                if (!existingCoordinates.includes(coordinates)) {
+                    items.push({
+                        title: '',
+                        content: '',
+                        x: block.x,
+                        y: block.y,
+                    });
+                }
+            });
+        } else {
+            // Set the default grid arrangement cookie
+            const serializedGrid = JSON.stringify(items);
+            Cookies.set('gridArrangement', serializedGrid);
+        }
+
         grid.load(items);
 
-        this.$nextTick(() => {
-            const elements = document.querySelectorAll('.grid-stack > .grid-stack-item');
+        // Save the user's grid arrangement to the cookie session
+        grid.on('change', (event, changedItems) => {
+            // Create a copy of the original items array
+            const updatedItems = items.slice();
+
+            // Update the changed items with their new values
+            changedItems.forEach((changedItem) => {
+                const {x, y, title, content} = changedItem;
+                const existingItem = updatedItems.find((item) => item.x === x && item.y === y);
+
+                if (existingItem) {
+                    existingItem.title = title;
+                    existingItem.content = content;
+                }
+            });
+
+            // Serialize and save only the updated items to the cookie
+            const serializedGrid = JSON.stringify(mapGridItems(updatedItems));
+            Cookies.set('gridArrangement', serializedGrid);
+        });
+
+        window.requestAnimationFrame(() => {
+            const elements = Array.from(document.querySelectorAll('.grid-stack > .grid-stack-item')).sort((a, b) => {
+                const aX = parseInt(a.getAttribute('data-gs-x'));
+                const bX = parseInt(b.getAttribute('data-gs-x'));
+                return aX - bX;
+            });
+
             elements.forEach((element, index) => {
                 element.classList.add('max-w-7xl', 'mx-auto', 'sm:px-2', 'lg:px-4');
-
                 const innerElement = element.querySelector('.grid-stack-item-content');
-                // the main cards
                 innerElement.classList.add(
                     'bg-white',
                     'dark:bg-gray-900',
@@ -57,23 +112,47 @@ export default {
                 );
                 innerElement.appendChild(wrapperDiv);
 
-                // Create a new <div> element for the title
-                const titleDiv = document.createElement('div');
-                titleDiv.classList.add('uppercase', 'underline', 'underline-offset-sm', 'font-bold', 'mb-2', 'text-white');
-                titleDiv.textContent = items[index].title;
+                if (innerElement) {
+                    const titleDiv = document.createElement('div');
+                    titleDiv.classList.add('uppercase', 'underline', 'underline-offset-sm', 'font-bold', 'mb-2', 'text-white', 'title');
+                    titleDiv.textContent = items[index].title;
 
-                // Create a new <div> element for the content
-                const contentDiv = document.createElement('div');
-                contentDiv.classList.add('content', 'text-base', 'mt-2');
-                contentDiv.textContent = items[index].content;
+                    const contentDiv = document.createElement('div');
+                    contentDiv.classList.add('content', 'text-base', 'mt-2');
+                    contentDiv.textContent = items[index].content;
 
-                // Append the title and content divs to the wrapperDiv
-                wrapperDiv.appendChild(titleDiv);
-                wrapperDiv.appendChild(contentDiv);
+                    // Append the title and content divs to the wrapperDiv
+                    wrapperDiv.appendChild(titleDiv);
+                    wrapperDiv.appendChild(contentDiv);
+                }
+
+                // Render the grid items
+                this.updateGridUI(innerElement, items[index].title, items[index].content);
             });
         });
     },
+
+    methods: {
+        // Update the UI based on the grid arrangement
+        updateGridUI(innerElement, title, content) {
+            const titleElement = innerElement.querySelector('.title');
+            const contentElement = innerElement.querySelector('.content');
+
+            // Update the title and content
+            titleElement.textContent = title;
+            contentElement.textContent = content;
+        },
+    },
 };
+
+function mapGridItems(gridItems) {
+    return gridItems.map((item) => ({
+        title: item.title || '',
+        content: item.content || '',
+        x: item.x,
+        y: item.y,
+    }));
+}
 </script>
 
 <style scoped>
