@@ -12,64 +12,94 @@ import {GridStack} from 'gridstack';
 import Cookies from 'js-cookie';
 
 export default {
-    mounted() {
-        let items = [
-            {title: 'Active Builds', content: 'You are currently working on: R2-D2, R5-D4, BB8', x: 0, y: 0},
-            {title: 'Completed Builds', content: 'You have completed 10 Droids!', x: 1, y: 0},
-            {title: 'Notifications', content: 'No new notifications', x: 2, y: 0},
-        ];
+    data() {
+        return {
+            items: [
+                {
+                    title: 'Active Builds',
+                    content: 'You are currently working on: R2-D2, R5-D4, BB8',
+                    x: 0,
+                    y: 0,
+                    w: 0,
+                    h: 0
+                },
+                {title: 'Completed Builds', content: 'You have completed 10 Droids!', x: 1, y: 0, w: 0, h: 0},
+                {title: 'Notifications', content: 'No new notifications', x: 2, y: 0, w: 0, h: 0},
+            ],
+        };
+    },
 
+    mounted() {
         let grid = GridStack.init({column: 3});
 
         // Load the user's preset grid arrangement if it exists
         const savedGrid = Cookies.get('gridArrangement');
         const parsedGrid = savedGrid ? JSON.parse(savedGrid) : null;
 
-        if (parsedGrid) {
-            items = mapGridItems(parsedGrid, items);
-        }
-
         // Add missing blocks to the items array
         if (parsedGrid) {
-            const existingCoordinates = items.map((item) => `${item.x}-${item.y}`);
+            const existingCoordinates = this.items.map((item) => `${item.x}-${item.y}`);
+            this.items = mapGridItems(parsedGrid, this.items);
+            this.items.forEach((item) => {
+                const element = document.querySelector(`[data-gs-x="${item.x}"][data-gs-y="${item.y}"]`);
+                console.log(element);
+                if (element) {
+                    item.w = element.clientWidth;
+                    item.h = element.clientHeight;
+                }
+            });
+
             parsedGrid.forEach((block) => {
                 const coordinates = `${block.x}-${block.y}`;
                 if (!existingCoordinates.includes(coordinates)) {
-                    items.push({
+                    this.items.push({
                         title: '',
                         content: '',
                         x: block.x,
                         y: block.y,
+                        w: block.w,
+                        h: block.h
                     });
                 }
             });
         } else {
             // Set the default grid arrangement cookie
-            const serializedGrid = JSON.stringify(items);
+            this.items.forEach((item) => {
+                const element = document.querySelector(`[data-gs-x="${item.x}"][data-gs-y="${item.y}"]`);
+                if (element) {
+                    item.w = element.getAttribute('data-gs-width');
+                    item.h = element.getAttribute('data-gs-height');
+                }
+            });
+
+
+            const serializedGrid = JSON.stringify(this.items);
             Cookies.set('gridArrangement', serializedGrid);
         }
 
-        grid.load(items);
+        grid.load(this.items);
 
         // Save the user's grid arrangement to the cookie session
         grid.on('change', (event, changedItems) => {
             // Create a copy of the original items array
-            const updatedItems = items.slice();
+            const updatedItems = this.items.slice();
 
             // Update the changed items with their new values
             changedItems.forEach((changedItem) => {
                 const {x, y, title, content} = changedItem;
                 const existingItem = updatedItems.find((item) => item.x === x && item.y === y);
-
                 if (existingItem) {
                     existingItem.title = title;
                     existingItem.content = content;
+                    existingItem.x = changedItem.x;
+                    existingItem.y = changedItem.y;
+                    existingItem.w = changedItem.w;
+                    existingItem.h = changedItem.h;
                 }
             });
 
-            // Serialize and save only the updated items to the cookie
-            const serializedGrid = JSON.stringify(mapGridItems(updatedItems));
-            Cookies.set('gridArrangement', serializedGrid);
+            // Update the items array with the updated items
+            this.items = updatedItems;
         });
 
         window.requestAnimationFrame(() => {
@@ -91,7 +121,7 @@ export default {
                     'transition',
                     'duration-500',
                     'sm:rounded-lg',
-                    'cursor-move'
+                    'cursor-move',
                 );
 
                 // Clear the existing content
@@ -115,11 +145,11 @@ export default {
                 if (innerElement) {
                     const titleDiv = document.createElement('div');
                     titleDiv.classList.add('uppercase', 'underline', 'underline-offset-sm', 'font-bold', 'mb-2', 'text-white', 'title');
-                    titleDiv.textContent = items[index].title;
+                    titleDiv.textContent = this.items[index].title;
 
                     const contentDiv = document.createElement('div');
                     contentDiv.classList.add('content', 'text-base', 'mt-2');
-                    contentDiv.textContent = items[index].content;
+                    contentDiv.textContent = this.items[index].content;
 
                     // Append the title and content divs to the wrapperDiv
                     wrapperDiv.appendChild(titleDiv);
@@ -127,9 +157,21 @@ export default {
                 }
 
                 // Render the grid items
-                this.updateGridUI(innerElement, items[index].title, items[index].content);
+                this.updateGridUI(innerElement, this.items[index].title, this.items[index].content);
             });
         });
+    },
+
+    watch: {
+        items: {
+            deep: true,
+            handler(newItems) {
+                // Serialize and save only the updated items to the cookie
+                const serializedGrid = JSON.stringify(mapGridItems(newItems));
+                console.log(serializedGrid);
+                Cookies.set('gridArrangement', serializedGrid);
+            }
+        }
     },
 
     methods: {
@@ -151,6 +193,8 @@ function mapGridItems(gridItems) {
         content: item.content || '',
         x: item.x,
         y: item.y,
+        w: item.w,
+        h: item.h
     }));
 }
 </script>
