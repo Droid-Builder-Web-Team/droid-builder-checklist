@@ -42,15 +42,18 @@ class ToDoController extends Controller
      */
     public function store(Request $request)
     {
-//        dd($request);
+        $validated = $request->validate([
+            'todoItem.user_droid_id' => 'nullable|exists:user_droids, id',
+            'todoItem.text' => 'required'
+        ]);
 
         $newTodoItem = new UserToDo;
         $newTodoItem->user_id = Auth::id();
-        $newTodoItem->user_droid_id = $request->todoItem['user_droid_id'] ?: null;
-        $newTodoItem->text = $request->todoItem['text'];
+        $newTodoItem->user_droid_id = $validated['todoItem']['user_droid_id'] ?: null;
+        $newTodoItem->text = $validated['todoItem']['text'];
         $newTodoItem->save();
 
-        return $newTodoItem;
+        return response()->json($newTodoItem, 201);
     }
 
     /**

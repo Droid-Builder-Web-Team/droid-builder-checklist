@@ -1,23 +1,32 @@
 <template>
-    <div class="modal-header flex items-center justify-between">
+    <div class="modal-header grid grid-cols-2">
         <h3>Add a new item</h3>
-        <button class="flex content-center" @click="closeModal">
+        <button class="justify-self-end" @click="closeModal">
             <i class="fa-solid fa-x"></i>
         </button>
     </div>
+
     <div class="form-item">
         <label>Assign this item to a droid you're building:</label>
-        <select>
+        <select v-model="todoItem.user_droid_id" name="user_droid_id">
             <option>You're not building any droids</option>
         </select>
     </div>
     <div class="form-item">
         <label>Item Description:</label>
-        <textarea v-model="todoItem.text" placeholder="Patch Death Star Exhaust Port..."></textarea>
+        <textarea v-model="todoItem.text" name="text" placeholder="Patch Death Star Exhaust Port..."></textarea>
     </div>
-    <button @click="showSuccessNotification">Show Success Notification</button>
 
-    <button @click="saveModal">Save</button>
+    <div class="button-wrapper">
+        <button
+            class="inline-block px-6 py-1 transition-colors text-gray-100 border border-gray-100 rounded hover:bg-gray-100 hover:text-gray-900 active:bg-gray-100 focus:outline-none focus:ring"
+            @click="closeModal">Cancel
+        </button>
+        <button
+            class="inline-block px-6 py-1 transition-colors text-gray-100 border border-gray-100 rounded hover:bg-gray-100 hover:text-gray-900 active:bg-gray-100 focus:outline-none focus:ring"
+            @click="saveModal">Save
+        </button>
+    </div>
 </template>
 
 <script>
@@ -31,38 +40,48 @@ export default {
             todoItem: {
                 user_droid_id: null,
                 text: '',
-            }
+            },
         }
     },
 
     methods: {
         saveModal() {
-            if (this.todoItem.text === '') {
-                return;
+            if (!this.todoItem.user_droid_id && this.todoItem.text === '') {
+                let error = 'You cannot submit an empty form.';
+                this.showFailureNotification(error);
+            } else {
+                axios.post('/api/todo/store', {
+                    todoItem: this.todoItem
+                })
+                    .then(response => {
+                        if (response.status === 201) {
+                            this.todoItem.user_droid_id = ""
+                            this.todoItem.text = "";
+                            this.$emit("item-added"); // Emit the "item-added" event
+                            this.showSuccessNotification();
+                        }
+                    })
+                    .catch(error => {
+                        this.showFailureNotification(error);
+                    })
             }
-
-            axios.post('/api/todo/store', {
-                todoItem: this.todoItem
-            })
-                .then(response => {
-                    if (response.status === 201) {
-                        this.todoItem.user_droid_id = ""
-                        this.todoItem.text = "";
-                        this.$emit("item-added"); // Emit the "item-added" event
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
         },
-
         handleButtonClick() {
             this.closeModal(); // Call the parent component's closeModal method
         },
 
         showSuccessNotification() {
             const toast = useToast(); // Access the useToast function
-            toast.success('Custom notification message', {
+            toast.success('Item Successfully Added', {
+                position: 'top-right',
+                timeout: 3000,
+                transition: 'fade'
+            });
+        },
+
+        showFailureNotification(error) {
+            const toast = useToast(); // Access the useToast function
+            toast.error('There was a problem adding this item!' + ' ' + error, {
                 position: 'top-right',
                 timeout: 3000,
                 transition: 'fade'
@@ -81,10 +100,16 @@ export default {
 }
 
 .modal-header {
-    display: flex;
+    width: 100%;
 }
 
 h3 {
     font-size: 1.5rem;
+}
+
+.button-wrapper {
+    padding-top: 1rem;
+    display: flex;
+    gap: 2rem;
 }
 </style>

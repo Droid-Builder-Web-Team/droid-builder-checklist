@@ -23,9 +23,6 @@
                                             @close="closeModal"
                                             @item-added="handleItemAdded"
                                         />
-                                        <div class="button-wrapper">
-                                            <button @click="closeModal">Cancel</button>
-                                        </div>
                                     </div>
                                 </transition>
                             </div>
@@ -76,7 +73,7 @@ export default {
     },
     methods: {
         fetchUserTodo() {
-            // Make your API fetch here to get user todo list and related droids
+            // Make your API fetch here to get user to do list and related droids
             // Once you have the response, assign the relevant droids data to userDroids
             fetch('/api/todo-list')
                 .then(response => response.json())
@@ -146,6 +143,7 @@ body.modal-open {
 .modal-wrapper {
     width: 100%;
     height: 100vh;
+    min-height: 50vh;
     overflow-y: auto;
     background-color: rgba(153, 162, 200, 0.5);
     display: flex;
@@ -170,12 +168,6 @@ body.modal-open {
     justify-content: center;
     padding-inline: 2rem;
     pointer-events: auto;
-}
-
-.button-wrapper {
-    padding-top: 1rem;
-    display: flex;
-    gap: 2rem;
 }
 
 .fade-enter-active,
