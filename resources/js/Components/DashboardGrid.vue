@@ -16,6 +16,7 @@ export default {
         return {
             items: [
                 {
+                    id: 1,
                     title: 'Active Builds',
                     content: 'You are currently working on: R2-D2, R5-D4, BB8',
                     x: 0,
@@ -23,8 +24,8 @@ export default {
                     w: 0,
                     h: 0
                 },
-                {title: 'Completed Builds', content: 'You have completed 10 Droids!', x: 1, y: 0, w: 0, h: 0},
-                {title: 'Notifications', content: 'No new notifications', x: 2, y: 0, w: 0, h: 0},
+                {id: 2, title: 'Todo List', content: 'Hurray! Nothing to do!', x: 1, y: 0, w: 0, h: 0},
+                {id: 3, title: 'Notifications', content: 'No new notifications', x: 2, y: 0, w: 0, h: 0},
             ],
         };
     },
@@ -52,6 +53,7 @@ export default {
                 const coordinates = `${block.x}-${block.y}`;
                 if (!existingCoordinates.includes(coordinates)) {
                     this.items.push({
+                        id: block.id,
                         title: '',
                         content: '',
                         x: block.x,
@@ -79,14 +81,10 @@ export default {
 
         // Save the user's grid arrangement to the cookie session
         grid.on('change', (event, changedItems) => {
-            // Create a copy of the original items array
-            const updatedItems = this.items.slice();
-
             // Update the changed items with their new values
             changedItems.forEach((changedItem) => {
-                console.log(changedItem);
                 const {x, y, title, content} = changedItem;
-                const existingItem = updatedItems.find((item) => item.x === x && item.y === y);
+                const existingItem = this.items.find((item) => item.x === x && item.y === y);
                 if (existingItem) {
                     existingItem.title = title;
                     existingItem.content = content;
@@ -96,9 +94,6 @@ export default {
                     existingItem.h = changedItem.h;
                 }
             });
-
-            // Update the items array with the updated items
-            this.items = updatedItems;
         });
 
         window.requestAnimationFrame(() => {
@@ -167,9 +162,6 @@ export default {
             handler(newItems) {
                 // Serialize and save only the updated items to the cookie
                 const serializedGrid = JSON.stringify(mapGridItems(newItems));
-                setTimeout(function () {
-                    console.log(serializedGrid)
-                }, 2000);
                 Cookies.set('gridArrangement', serializedGrid);
             }
         }
@@ -190,6 +182,7 @@ export default {
 
 function mapGridItems(gridItems) {
     return gridItems.map((item) => ({
+        id: item.id,
         title: item.title || '',
         content: item.content || '',
         x: item.x,

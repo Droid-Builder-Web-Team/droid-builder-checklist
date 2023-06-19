@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ToDoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::middleware('auth:sanctum')->get('/todo-list', [ToDoController::class, 'index']);
+Route::middleware('auth:sanctum')->prefix('/todo')->group(function () {
+    Route::post('/store', [ToDoController::class, 'store']);
+    Route::put('/{todItemId}', [ToDoController::class, 'update']);
+    Route::delete('/{todoItemId', [ToDoController::class, 'destroy']);
 });

@@ -23,6 +23,12 @@
 
         <div class="max-w-7xl mx-auto sm:px-2 lg:px-4">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-lg text-center">
+                <UserToDoList/>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto sm:px-2 lg:px-4">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-lg text-center">
                 <DashboardGrid/>
             </div>
         </div>
@@ -35,6 +41,7 @@ import {Head} from '@inertiajs/vue3';
 import GreetingMessage from '@/Components/GreetingMessage.vue';
 import QuotesAPI from "@/Components/QuotesAPI.vue";
 import DashboardGrid from "@/Components/DashboardGrid.vue";
+import UserToDoList from "@/Components/UserToDoList.vue";
 </script>
 
 <style scoped>
