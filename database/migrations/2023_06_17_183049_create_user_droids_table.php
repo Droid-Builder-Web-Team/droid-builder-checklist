@@ -14,8 +14,8 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('mainframe_droid_id');
-
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
