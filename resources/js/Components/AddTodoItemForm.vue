@@ -1,7 +1,7 @@
 <template>
     <div class="modal-header grid grid-cols-2">
         <h3>Add a new item</h3>
-        <button class="justify-self-end" @click="closeModal">
+        <button class="justify-self-end close-button transition-colors" @click="closeModal">
             <i class="fa-solid fa-x"></i>
         </button>
     </div>
@@ -111,5 +111,9 @@ h3 {
     padding-top: 1rem;
     display: flex;
     gap: 2rem;
+}
+
+.close-button:hover svg path {
+    fill: #9ca3af;
 }
 </style>

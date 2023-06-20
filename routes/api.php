@@ -23,5 +23,5 @@ Route::middleware('auth:sanctum')->get('/todo-list', [ToDoController::class, 'in
 Route::middleware('auth:sanctum')->prefix('/todo')->group(function () {
     Route::post('/store', [ToDoController::class, 'store']);
     Route::put('/{todItemId}', [ToDoController::class, 'update']);
-    Route::delete('/{todoItemId', [ToDoController::class, 'destroy']);
+    Route::delete('/{todoItemId}', [ToDoController::class, 'destroy']);
 });

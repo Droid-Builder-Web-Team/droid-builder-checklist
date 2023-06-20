@@ -80,11 +80,12 @@ class ToDoController extends Controller
         $existingTodoItem = UserToDo::find($todItemId);
 
         if ($existingTodoItem) {
-            $existingTodoItem->completed = (bool)$request->item['completed'];
-            $existingTodoItem->updated_at = Carbon::now();
-            $existingTodoItem->save();
+            $existingTodoItem->update([
+                'completed' => (bool)$request->completed,
+                'updated_at' => Carbon::now(),
+            ]);
 
-            return $existingTodoItem;
+            return response()->json($existingTodoItem, 201);
         }
 
         return "Item not found";
@@ -98,7 +99,8 @@ class ToDoController extends Controller
         $existingTodoItem = UserToDo::find($todItemId);
         if ($existingTodoItem) {
             $existingTodoItem->delete();
-            return 'Item Deleted';
+
+            return response()->json($existingTodoItem, 201);
         }
 
         return "Item Not Found";

@@ -6,9 +6,10 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Dashboard</h2>
         </template>
 
-        <div class="py-12">
+        <div class="py-6">
             <div class="max-w-7xl mx-auto sm:px-2 lg:px-4">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-lg text-center">
+                <div
+                    class="bg-white dark:bg-gray-800 overflow-hidden shadow-light-shadow hover:shadow-lighter-shadow transition duration-500 sm:rounded-lg text-center">
                     <div class="pt-6 text-2xl text-gray-900 dark:text-gray-100">
                         <GreetingMessage/>
                         {{ $page.props.auth.user.name }}.
@@ -21,15 +22,16 @@
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto sm:px-2 lg:px-4">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-lg text-center">
-                <UserToDoList/>
-            </div>
+        <div class="py-3">
+            <UserToDoList/>
         </div>
 
-        <div class="max-w-7xl mx-auto sm:px-2 lg:px-4">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-lg text-center">
-                <DashboardGrid/>
+        <div class="py-3">
+            <div class="max-w-7xl mx-auto sm:px-2 lg:px-4">
+                <div
+                    class="bg-white dark:bg-gray-800 overflow-hidden shadow-light-shadow hover:shadow-lighter-shadow transition duration-500 sm:rounded-lg text-center">
+                    <DashboardGrid/>
+                </div>
             </div>
         </div>
     </AuthenticatedLayout>

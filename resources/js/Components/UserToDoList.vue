@@ -4,8 +4,12 @@
             <div
                 class="bg-white dark:bg-gray-800 overflow-hidden shadow-light-shadow hover:shadow-lighter-shadow transition duration-500 sm:rounded-lg">
                 <div class="p-6 w-100 flex flex-1 flex-col gap-2 text-gray-900 dark:text-gray-100 text-base">
-                    <p class="uppercase underline underline-offset-sm font-bold mb-2">My Todo List</p>
-                    <button v-if="!visible" @click="handleButtonClick">Add New Item</button>
+                    <p class="uppercase underline underline-offset-sm text-center font-bold mb-2">My Todo List</p>
+                    <button
+                        v-if="!visible"
+                        class="w-fit mx-auto my-2 px-6 py-1 flex items-center gap-3 group transition-colors text-gray-100 border border-gray-100 rounded hover:bg-gray-100 hover:text-gray-900 active:bg-gray-100 focus:outline-none focus:ring" @click="handleButtonClick">Add New Item<i
+                        class="fa-solid fa-plus group-hover:rotate-45"></i></button>
+
 
                     <Teleport to="body">
                         <transition name="fade">
@@ -14,39 +18,37 @@
                                 class="modal-wrapper"
                                 @click.self="closeModal"
                             >
-                                <transition name="fade">
-                                    <div v-show="open" class="todo-modal"
-                                    >
-                                        <add-todo-item-form
-                                            v-show="open && visible"
-                                            :closeModal="closeModal"
-                                            @close="closeModal"
-                                            @item-added="handleItemAdded"
-                                        />
-                                    </div>
-                                </transition>
+                                <div v-show="open"
+                                     class="todo-modal bg-white dark:bg-gray-800 shadow-light-shadow hover:shadow-lighter-shadow transition duration-500 sm:rounded-lg">
+                                    <add-todo-item-form
+                                        v-show="open && visible"
+                                        :closeModal="closeModal"
+                                        @close="closeModal"
+                                        @item-added="handleItemAdded"
+                                    />
+                                </div>
                             </div>
                         </transition>
                     </Teleport>
-                    <ul v-if="userTodo.length > 0" class="custom-list--user-todo">
+                    <ul v-if="userTodo.length > 0" class="custom-list--user-todo text-center">
                         <li v-for="(item, index) in userTodo" :key="index"
-                            class="flex items-center justify-evenly even:bg-gray-600 odd:bg-gray-800"
+                            class="grid grid-cols-3 items-center justify-evenly even:bg-gray-600 odd:bg-gray-800"
                             v-on:itemchanged="$emit('reloadlist')"
                             v-on:reloadlist="fetchUserTodo()">
                             <span class="list-item">{{ item.text }}</span>
                             <span v-if="item.user_droid_id !== null">{{ item.user_droid.mainframe_droid.name }}</span>
                             <span v-else>Not assigned to a build</span>
-                            <div class="button-wrapper flex flex-row gap-4">
-                                <button>
+                            <div class="button-wrapper flex flex-row justify-center gap-4">
+                                <button @click="completeTodoItem(item.id)" @item-updated="handleItemUpdated">
                                     <i class="fa-solid fa-square-check transition-colors text-2xl hover:text-green-500"></i>
                                 </button>
-                                <button>
-                                    <i class="fa-solid fa-trash transition-colors text-2xl hover:text-red-500"></i>
-                                </button>
+                                <confirm-delete :item="item" :refresh="fetchUserTodo" @delete="deleteTodoItem(item.id)">
+                                    <!-- Customize the confirmation message or UI elements here if needed -->
+                                </confirm-delete>
                             </div>
                         </li>
                     </ul>
-                    <div v-else><p>Hurray! You have nothing to do!</p></div>
+                    <div v-else><p class="text-center">Hurray! You have nothing to do!</p></div>
                 </div>
             </div>
         </div>
@@ -54,10 +56,15 @@
 </template>
 <script>
 import AddTodoItemForm from "@/Components/AddTodoItemForm.vue";
+import ConfirmDelete from "@/Components/ConfirmDelete.vue";
+import {useToast} from "vue-toastification";
+import axios from "axios";
+
 
 export default {
     components: {
         AddTodoItemForm,
+        ConfirmDelete,
     },
 
     data() {
@@ -111,6 +118,36 @@ export default {
             document.body.style.overflow = '';
 
         },
+
+        completeTodoItem(todoItemId) {
+            axios.put(`/api/todo/${todoItemId}`, {
+                completed: 1,
+            })
+                .then(response => {
+                    if (response.status === 201) {
+                        this.$emit("item-changed");
+                        this.fetchUserTodo();
+                        const toast = useToast(); // Access the useToast function
+                        toast.success('Item Successfully Completed', {
+                            position: 'top-right',
+                            timeout: 3000,
+                            transition: 'fade'
+                        });
+                    }
+                })
+                .catch(error => {
+                    const toast = useToast(); // Access the useToast function
+                    toast.error('There was a problem completing this item!' + ' ' + error, {
+                        position: 'top-right',
+                        timeout: 3000,
+                        transition: 'fade'
+                    });
+                })
+        },
+
+        handleItemUpdated() {
+            this.fetchUserTodo(); // Fetch the updated list of items
+        },
     },
     transitions: {
         fade: {
@@ -126,13 +163,12 @@ export default {
     padding-left: 1rem;
     list-style-type: none;
     display: flex;
+    flex-wrap: wrap;
     flex-direction: column;
     gap: 0.5rem;
 }
 
 .custom-list li {
-    display: flex;
-    align-items: center;
     gap: 0.5rem;
 }
 
@@ -158,7 +194,6 @@ body.modal-open {
 .todo-modal {
     min-height: 50%;
     min-width: 50%;
-    background-color: #1a202c;
     color: #cbd5e0;
     z-index: 1024;
     margin-inline: auto;
