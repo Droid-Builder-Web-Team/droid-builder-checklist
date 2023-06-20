@@ -100,7 +100,7 @@ class ToDoController extends Controller
         if ($existingTodoItem) {
             $existingTodoItem->delete();
 
-            return response()->json($existingTodoItem, 201);
+            return response()->json($existingTodoItem, 204);
         }
 
         return "Item Not Found";
